@@ -85,7 +85,7 @@ class Site(DataClassJsonMixin):
             output = os.path.join(out, relDir)
             if not file.endswith(".md"):
                 shell.mkdir(os.path.dirname(output))
-                shell.cp(file, out)
+                shell.cp(file, output)
                 continue
 
             output = output.replace(".md", ".html")
