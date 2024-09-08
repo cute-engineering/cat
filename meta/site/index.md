@@ -1,3 +1,3 @@
-**Cat** is a tiny static site generator for CuteKit.
+**Cat** is a tiny static site generator.
 
-![Cat writting the blog](cat.jpg)
+<img alt="Cat writting the blog" src="cat.jpg"/>

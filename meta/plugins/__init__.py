@@ -40,6 +40,10 @@ def fixupLinks(html: str, path: str) -> str:
     )
 
 
+class BuildArgs:
+    theme: str = cli.arg(None, "theme", "Theme to use", default="default")
+
+
 @dt.dataclass
 class Site(DataClassJsonMixin):
     title: str = dt.field()
@@ -67,12 +71,14 @@ class Site(DataClassJsonMixin):
     def renderHeader(self) -> str:
         return f'<a href="/"><h1>{self.header or self.title}</h1></a>'
 
-    def renderAll(self, out: str):
-        styleFile = os.path.join(SITE_DIR, "style.css")
-        if not os.path.exists(styleFile):
-            styleFile = DEFAULT_STYLE_PATH
+    def renderAll(self, out: str, args: BuildArgs) -> None:
+        style = ""
+        style += readFile(__file__.replace("__init__.py", f"{args.theme}.css"))
 
-        style = readFile(styleFile)
+        styleFile = os.path.join(SITE_DIR, "style.css")
+        if os.path.exists(styleFile):
+            style += "\n\n\n"
+            style += readFile(styleFile)
 
         md = markdown.Markdown(extensions=["meta"])
         files = shell.find(SITE_DIR)
@@ -140,11 +146,11 @@ def _():
 
 
 @cli.command("b", "cat/build", "Build the site")
-def _() -> None:
+def _(args: BuildArgs) -> None:
     shell.rmrf(SITE_BUILD_DIR)
     shell.mkdir(SITE_BUILD_DIR)
     site = Site.load()
-    site.renderAll(SITE_BUILD_DIR)
+    site.renderAll(SITE_BUILD_DIR, args)
 
     print(f"{CAT} Site built at {SITE_BUILD_DIR}")
 
@@ -157,11 +163,11 @@ def _():
 
 
 @cli.command("s", "cat/serve", "Serve the site")
-def _():
+def _(args: BuildArgs):
     shell.rmrf(SITE_BUILD_DIR)
     shell.mkdir(SITE_BUILD_DIR)
     site = Site.load()
-    site.renderAll(SITE_BUILD_DIR)
+    site.renderAll(SITE_BUILD_DIR, args)
 
     os.chdir(SITE_BUILD_DIR)
 
