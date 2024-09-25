@@ -170,10 +170,8 @@ def _(args: BuildArgs):
     site = Site.load()
     site.renderAll(SITE_BUILD_DIR, args)
 
-    os.chdir(SITE_BUILD_DIR)
-
     print(f"{CAT} Serving site")
-    shell.exec(sys.executable, "-m", "http.server")
+    shell.exec(sys.executable, "-m", "http.server", "-d", SITE_BUILD_DIR)
 
 
 @cli.command("e", "cat/init", "Initialize the site")
