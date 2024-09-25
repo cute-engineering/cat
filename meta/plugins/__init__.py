@@ -80,7 +80,7 @@ class Site(DataClassJsonMixin):
             style += "\n\n\n"
             style += readFile(styleFile)
 
-        md = markdown.Markdown(extensions=["meta"])
+        md = markdown.Markdown(extensions=["meta", "extra"])
         for file in SITE_DIR.rglob("*"):
             if file.is_dir() or file.suffix == ".json":
                 continue
