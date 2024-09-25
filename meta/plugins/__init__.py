@@ -3,6 +3,7 @@ from cutekit import ensure
 ensure((0, 7, 0))
 
 import http.server
+import sys
 import os
 from pathlib import Path
 import markdown
@@ -172,7 +173,7 @@ def _(args: BuildArgs):
     os.chdir(SITE_BUILD_DIR)
 
     print(f"{CAT} Serving site")
-    shell.exec("python3", "-m", "http.server")
+    shell.exec(sys.executable, "-m", "http.server")
 
 
 @cli.command("e", "cat/init", "Initialize the site")
