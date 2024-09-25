@@ -22,12 +22,12 @@ SITE_BUILD_DIR = os.path.join(const.BUILD_DIR, "site")
 
 
 def readFile(path: str) -> str:
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf8") as f:
         return f.read()
 
 
 def writeFile(path: str, content: str):
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf8") as f:
         f.write(content)
 
 
