@@ -2,7 +2,6 @@ from cutekit import ensure
 
 ensure((0, 7, 0))
 
-import http.server
 import sys
 import os
 from pathlib import Path
@@ -13,27 +12,27 @@ from dataclasses_json import DataClassJsonMixin
 from cutekit import cli, const, shell, jexpr
 
 CAT = "ᓚ₍ ^. .^₎"
-DEFAULT_STYLE_PATH = __file__.replace("__init__.py", "default.css")
+DEFAULT_STYLE_PATH = Path(__file__).parent / "default.css"
 
-SITE_DIR = os.path.join(const.META_DIR, "site")
-SITE_BUILD_DIR = os.path.join(const.BUILD_DIR, "site")
+SITE_DIR = Path(const.META_DIR) / "site"
+SITE_BUILD_DIR = Path(const.BUILD_DIR) / "site"
 
 
 # MARK: Model ------------------------------------------------------------------
 
 
-def readFile(path: str) -> str:
-    with open(path, "r", encoding="utf8") as f:
+def readFile(path: Path) -> str:
+    with path.open("r", encoding="utf8") as f:
         return f.read()
 
 
-def writeFile(path: str, content: str):
-    with open(path, "w", encoding="utf8") as f:
+def writeFile(path: Path, content: str):
+    with path.open("w", encoding="utf8") as f:
         f.write(content)
 
 
-def fixupLinks(html: str, path: str) -> str:
-    rootPath = os.path.relpath(".", os.path.dirname(path))
+def fixupLinks(html: str, path: Path) -> str:
+    rootPath = os.path.relpath(".", path.parent)
     return (
         html.replace('.md"', '.html"')
         .replace(".md#", ".html#")
@@ -57,8 +56,8 @@ class Site(DataClassJsonMixin):
 
     @staticmethod
     def load() -> "Site":
-        siteFile = os.path.join(SITE_DIR, "site.json")
-        siteJson = jexpr.include(Path(siteFile))
+        siteFile = SITE_DIR / "site.json"
+        siteJson = jexpr.include(siteFile)
         site = Site.from_dict(siteJson)
         site.path = siteFile
         return site
@@ -72,36 +71,35 @@ class Site(DataClassJsonMixin):
     def renderHeader(self) -> str:
         return f'<a href="/"><h1>{self.header or self.title}</h1></a>'
 
-    def renderAll(self, out: str, args: BuildArgs) -> None:
+    def renderAll(self, out: Path, args: BuildArgs) -> None:
         style = ""
-        style += readFile(__file__.replace("__init__.py", f"{args.theme}.css"))
+        style += readFile(Path(__file__).parent / f"{args.theme}.css")
 
-        styleFile = os.path.join(SITE_DIR, "style.css")
-        if os.path.exists(styleFile):
+        styleFile = SITE_DIR / "style.css"
+        if styleFile.exists():
             style += "\n\n\n"
             style += readFile(styleFile)
 
         md = markdown.Markdown(extensions=["meta"])
-        files = shell.find(SITE_DIR)
-        for file in files:
-            if file.endswith(".json"):
+        for file in SITE_DIR.rglob("*"):
+            if file.is_dir() or file.suffix == ".json":
                 continue
 
-            relDir = file.replace(SITE_DIR + "/", "")
-            print(f"Processing {relDir}")
-            output = os.path.join(out, relDir)
-            if not file.endswith(".md"):
-                shell.mkdir(os.path.dirname(output))
+            relDir = file.relative_to(SITE_DIR)
+
+            output = out / relDir
+            if not file.suffix == ".md":
+                output.parent.mkdir(parents=True, exist_ok=True)
                 shell.cp(file, output)
                 continue
 
-            output = output.replace(".md", ".html")
+            output = output.with_suffix(".html")
 
             print(f"Rendering {file} -> {output}")
 
-            shell.mkdir(os.path.dirname(output))
+            output.parent.mkdir(parents=True, exist_ok=True)
 
-            mdContent = readFile(path=file)
+            mdContent = readFile(file)
             htmlContent = md.convert(mdContent)
 
             title = md.Meta.get("title", [""])[0]
@@ -166,19 +164,19 @@ def _():
 @cli.command("s", "cat/serve", "Serve the site")
 def _(args: BuildArgs):
     shell.rmrf(SITE_BUILD_DIR)
-    shell.mkdir(SITE_BUILD_DIR)
+    SITE_BUILD_DIR.mkdir(parents=True)
     site = Site.load()
     site.renderAll(SITE_BUILD_DIR, args)
 
     print(f"{CAT} Serving site")
-    shell.exec(sys.executable, "-m", "http.server", "-d", SITE_BUILD_DIR)
+    shell.exec(sys.executable, "-m", "http.server", "-d", str(SITE_BUILD_DIR))
 
 
 @cli.command("e", "cat/init", "Initialize the site")
 def _():
-    shell.mkdir(SITE_DIR)
+    SITE_DIR.mkdir(parents=True, exist_ok=True)
     writeFile(
-        os.path.join(SITE_DIR, "site.json"),
+        SITE_DIR / "site.json",
         """
 {
     "favicon": "🐱",
@@ -191,7 +189,7 @@ def _():
     )
 
     writeFile(
-        os.path.join(SITE_DIR, "index.md"),
+        SITE_DIR / "index.md",
         """
 This is the home page of the site. You can edit this file to change the content of the home page.
 """,
