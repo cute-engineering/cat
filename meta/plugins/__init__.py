@@ -52,7 +52,7 @@ class Site(DataClassJsonMixin):
     navbar: str = dt.field(default="")
     footer: str = dt.field(default="")
 
-    path: str = dt.field(default="")
+    path: Path = dt.field(default=Path(""))
 
     @staticmethod
     def load() -> "Site":
@@ -69,7 +69,7 @@ class Site(DataClassJsonMixin):
         return f"data:image/svg+xml,{svgEscaped}"
 
     def renderHeader(self) -> str:
-        return f'<a href="/"><h1>{self.header or self.title}</h1></a>'
+        return f'<a class="title" href="/"><h1>{self.header or self.title}</h1></a>'
 
     def renderAll(self, out: Path, args: BuildArgs) -> None:
         style = ""
@@ -181,7 +181,7 @@ def _():
 {
     "favicon": "🐱",
     "title": "Cat",
-    "header": "<span style=\\"white-space: nowrap;\\">ᓚ₍ ^. .^₎</span>",
+    "header": "ᓚ₍ ^. .^₎",
     "navbar": "[Home](/)",
     "footer": "Built with [ᓚ₍ ^. .^₎](https://github.com/cute-engineering/cat)"
 }
