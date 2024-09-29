@@ -51,6 +51,7 @@ class Site(DataClassJsonMixin):
     favicon: str = dt.field(default="🐱")
     navbar: str = dt.field(default="")
     footer: str = dt.field(default="")
+    code_theme: str = dt.field(default="default")
 
     path: Path = dt.field(default=Path(""))
 
@@ -80,7 +81,7 @@ class Site(DataClassJsonMixin):
             style += "\n\n\n"
             style += readFile(styleFile)
 
-        md = markdown.Markdown(extensions=["meta", "extra"])
+        md = markdown.Markdown(extensions=["codehilite", "meta", "extra"])
         for file in SITE_DIR.rglob("*"):
             if file.is_dir() or file.suffix == ".json":
                 continue
@@ -107,6 +108,18 @@ class Site(DataClassJsonMixin):
                 title = f"{title} - {self.title}"
             else:
                 title = self.title
+
+            style += shell.popen(
+                "pygmentize",
+                "-S",
+                self.code_theme,
+                "-f",
+                "html",
+                "-a",
+                ".codehilite",
+                "-O",
+                "full",
+            )
 
             htmlContent = f"""
 <!DOCTYPE html>
