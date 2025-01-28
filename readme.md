@@ -17,7 +17,7 @@ Just add the following piece of json to your `project.json` file:
     "extern": {
         "cute-engineering/cat": {
             "git": "https://github.com/cute-engineering/cat.git",
-            "tag": "v0.7.0"
+            "tag": "v0.8.0"
         },
     }
 }
