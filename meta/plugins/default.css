@@ -97,7 +97,7 @@ img {
     max-width: 100%;
 }
 
-code {
+code:not(pre code) {
     font-family: monospace;
     padding: 2px;
     background-color: var(--code-background-color);
@@ -129,9 +129,8 @@ footer {
     width: auto !important;
 }
 
-.highlight,
-.code {
-    padding: 1px 15px;
+pre:has(code) {
+    padding: 15px;
     background-color: var(--code-background-color);
     color: var(--code-color);
     border-radius: 3px;
