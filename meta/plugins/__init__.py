@@ -1,6 +1,6 @@
 from cutekit import ensure
 
-ensure((0, 8, 0))
+ensure((0, 9, 0))
 
 import sys
 import os
@@ -14,9 +14,8 @@ from cutekit import cli, const, shell, jexpr
 CAT = "ᓚ₍ ^. .^₎"
 DEFAULT_STYLE_PATH = Path(__file__).parent / "default.css"
 
-SITE_DIR = Path(const.META_DIR) / "site"
+SITE_DIR = Path("doc")
 SITE_BUILD_DIR = Path(const.BUILD_DIR) / "site"
-
 
 # MARK: Model ------------------------------------------------------------------
 
@@ -139,12 +138,12 @@ class Site(DataClassJsonMixin):
 # MARK: Public interface -------------------------------------------------------
 
 
-@cli.command(None, "cat", "Tiny site generator")
+@cli.command("cat", "Tiny site generator")
 def _():
     pass
 
 
-@cli.command("b", "cat/build", "Build the site")
+@cli.command("cat/build", "Build the site")
 def _(args: BuildArgs) -> None:
     shell.rmrf(SITE_BUILD_DIR)
     shell.mkdir(SITE_BUILD_DIR)
@@ -154,14 +153,14 @@ def _(args: BuildArgs) -> None:
     print(f"{CAT} Site built at {SITE_BUILD_DIR}")
 
 
-@cli.command("c", "cat/clean", "Clean the site")
+@cli.command("cat/clean", "Clean the site")
 def _():
     shell.rmrf(SITE_BUILD_DIR)
 
     print(f"{CAT} Site cleaned")
 
 
-@cli.command("s", "cat/serve", "Serve the site")
+@cli.command("cat/serve", "Serve the site")
 def _(args: BuildArgs):
     shell.rmrf(SITE_BUILD_DIR)
     SITE_BUILD_DIR.mkdir(parents=True)
@@ -172,7 +171,7 @@ def _(args: BuildArgs):
     shell.exec(sys.executable, "-m", "http.server", "-d", str(SITE_BUILD_DIR))
 
 
-@cli.command("e", "cat/init", "Initialize the site")
+@cli.command("cat/init", "Initialize the site")
 def _():
     SITE_DIR.mkdir(parents=True, exist_ok=True)
     writeFile(

@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.project.v1",
-    "id": "cute-engineeering/cat",
+    "id": "cute-engineering/cat",
     "type": "project",
-    "version": "0.9.1",
+    "version": "0.10.0",
     "description": "A tiny static site generator for CuteKit projects."
 }
