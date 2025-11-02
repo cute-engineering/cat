@@ -1,6 +1,6 @@
 from cutekit import ensure
 
-ensure((0, 9, 0))
+ensure((0, 10, 0))
 
 import sys
 import os
